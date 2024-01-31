@@ -1,0 +1,1326 @@
+srivathsaachary@ip-172-31-24-65:~$ mysql -u Srivathsa -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 11
+Server version: 8.0.27-0ubuntu0.20.04.1 (Ubuntu)
+
+Copyright (c) 2000, 2023, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| TeslaDB            |
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+5 rows in set (0.00 sec)
+
+mysql> use TeslaDB;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+mysql> describe TeslaDB;
+ERROR 1146 (42S02): Table 'TeslaDB.TeslaDB' doesn't exist
+mysql> drop TeslaDB;
+ERROR 2013 (HY000): Lost connection to MySQL server during query
+No connection. Trying to reconnect...
+Connection id:    8
+Current database: TeslaDB
+
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'TeslaDB' at line 1
+mysql> drop database TeslaDB;
+Query OK, 5 rows affected (0.06 sec)
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+4 rows in set (0.00 sec)
+
+mysql> CREATE DATABASE tesladb;
+Query OK, 1 row affected (0.02 sec)
+
+mysql> USE TeslaDB;
+ERROR 1049 (42000): Unknown database 'TeslaDB'
+mysql> use tesladb;
+Database changed
+mysql> CREATE TABLE Customers(
+    -> 
+    -> Id int auto_increment primary key,
+    -> 
+    -> FirstName varchar(100) NOT NULL,
+    -> 
+    -> MiddleName varchar(100) NULL,
+    -> 
+    -> LastName varchar(100) NULL,
+    -> 
+    -> StreetName varchar(500) NULL,
+    -> 
+    -> City varchar(100) NULL,
+    -> StateId int NULL, 
+    -> EmailAddress varchar(500),
+    -> 
+    -> Password varchar(50));
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> describe Customers;
++--------------+--------------+------+-----+---------+----------------+
+| Field        | Type         | Null | Key | Default | Extra          |
++--------------+--------------+------+-----+---------+----------------+
+| Id           | int          | NO   | PRI | NULL    | auto_increment |
+| FirstName    | varchar(100) | NO   |     | NULL    |                |
+| MiddleName   | varchar(100) | YES  |     | NULL    |                |
+| LastName     | varchar(100) | YES  |     | NULL    |                |
+| StreetName   | varchar(500) | YES  |     | NULL    |                |
+| City         | varchar(100) | YES  |     | NULL    |                |
+| StateId      | int          | YES  |     | NULL    |                |
+| EmailAddress | varchar(500) | YES  |     | NULL    |                |
+| Password     | varchar(50)  | YES  |     | NULL    |                |
++--------------+--------------+------+-----+---------+----------------+
+9 rows in set (0.01 sec)
+
+mysql> CREATE TABLE Dealers(
+    -> 
+    -> Id int auto_increment primary key,
+    -> 
+    -> Name varchar(500) NOT NULL,
+    -> 
+    -> StreetName varchar(50) NULL,
+    -> 
+    -> City varchar(50) NULL,
+    -> 
+    -> StateId int NULL); 
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> CREATE TABLE LookupStates(
+    -> 
+    -> Id int auto_increment primary key,
+    -> 
+    -> Code varchar(50) NOT NULL,
+    -> 
+    -> FullName varchar(100) NOT NULL);
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> CREATE TABLE Models(
+    -> 
+    -> Id int auto_increment primary key,
+    -> 
+    -> Name varchar(50) NOT NULL,
+    -> 
+    -> Price int NOT NULL,
+    -> 
+    -> Description varchar(1000) NULL,
+    -> 
+    -> ImagePath varchar(500) NULL,
+    -> 
+    -> Range1 varchar(500) NULL,
+    -> 
+    -> Acceleration varchar(500) NULL,
+    -> 
+    -> TopSpeed int NULL,
+    -> 
+    -> AllWheelDrive bit NULL);
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> CREATE TABLE Orders(
+    -> 
+    -> Id int auto_increment primary key,
+    -> 
+    -> CustomerId int NOT NULL,
+    -> 
+    -> DealerId int NOT NULL,
+    -> 
+    -> ModelId int NOT NULL,
+    -> 
+    -> Quantity int NOT NULL,
+    -> 
+    -> Discount decimal(12, 2) NULL,
+    -> 
+    -> TotalAmount int NOT NULL,
+    -> 
+    -> OrderDate datetime NULL);
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> ALTER TABLE Customers
+    -> 
+    ->     ADD FOREIGN KEY (StateId)
+    -> 
+    ->     REFERENCES LookupStates(Id);
+Query OK, 0 rows affected (0.08 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql>     ALTER TABLE Dealers
+    -> 
+    ->     ADD FOREIGN KEY (StateId)
+    -> 
+    ->     REFERENCES LookupStates(Id);
+Query OK, 0 rows affected (0.07 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql>     ALTER TABLE Orders
+    -> 
+    ->     ADD FOREIGN KEY (CustomerId) 
+    -> 
+    ->     REFERENCES Customers(Id);
+Query OK, 0 rows affected (0.33 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> 
+mysql> 
+mysql>     ALTER TABLE Orders
+    -> 
+    ->     ADD FOREIGN KEY (DealerId) 
+    -> 
+    ->     REFERENCES Dealers(Id);
+Query OK, 0 rows affected (0.08 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql>     ALTER TABLE Orders
+    -> 
+    ->     ADD FOREIGN KEY (ModelId) 
+    -> 
+    ->     REFERENCES Models(Id);
+Query OK, 0 rows affected (0.07 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('AL', 'Alabama');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('AK', 'Alaska');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES('AS', 'American Samoa');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('AZ', 'Arizona');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES('AR', 'Arkansas');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES('CA', 'California');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('CO', 'Colorado');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('CT', 'Connecticut');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES('DE', 'Delaware');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('DC', 'District of Columbia');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES('FM', 'Federated LookupStatess of Micronesia');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('FL', 'Florida');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('GA', 'Georgia');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('GU', 'Guam');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('HI', 'Hawaii');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('ID', 'Idaho');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('IL', 'Illinois');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('IN', 'Indiana');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('IA', 'Iowa');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('KS', 'Kansas');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('KY', 'Kentucky');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('LA', 'Louisiana');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('ME', 'Maine');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('MH', 'Marshall Islands');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES('MD', 'Maryland');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('MA', 'Massachusetts');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('MI', 'Michigan');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('MN', 'Minnesota');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('MS', 'Mississippi');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('MO', 'Missouri');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('MT', 'Montana');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('NE', 'Nebraska');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('NV', 'Nevada');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('NH', 'New Hampshire');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('NJ', 'New Jersey');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('NM', 'New Mexico');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('NY', 'New York');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('NC', 'North Carolina'); 
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('ND', 'North Dakota');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('MP', 'Northern Mariana Islands');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('OH', 'Ohio');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('OK', 'Oklahoma');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('OR', 'Oregon');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('PW', 'Palau');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('PA', 'Pennsylvania');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('PR', 'Puerto Rico');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('RI', 'Rhode Island');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('SC', 'South Carolina'); 
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES('SD', 'South Dakota');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('TN', 'Tennessee');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('TX', 'Texas');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('UT', 'Utah');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('VT', 'Vermont');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('VI', 'Virgin Islands'); 
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('VA', 'Virginia');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('WA', 'Washington');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('WV', 'West Virginia');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> INSERT into LookupStates(Code, FullName) VALUES ('WI', 'Wisconsin');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> select * from lookupstates;
+ERROR 1146 (42S02): Table 'tesladb.lookupstates' doesn't exist
+mysql> SELECT * FROM LookupStates;
++----+------+---------------------------------------+
+| Id | Code | FullName                              |
++----+------+---------------------------------------+
+|  1 | AL   | Alabama                               |
+|  2 | AK   | Alaska                                |
+|  3 | AS   | American Samoa                        |
+|  4 | AZ   | Arizona                               |
+|  5 | AR   | Arkansas                              |
+|  6 | CA   | California                            |
+|  7 | CO   | Colorado                              |
+|  8 | CT   | Connecticut                           |
+|  9 | DE   | Delaware                              |
+| 10 | DC   | District of Columbia                  |
+| 11 | FM   | Federated LookupStatess of Micronesia |
+| 12 | FL   | Florida                               |
+| 13 | GA   | Georgia                               |
+| 14 | GU   | Guam                                  |
+| 15 | HI   | Hawaii                                |
+| 16 | ID   | Idaho                                 |
+| 17 | IL   | Illinois                              |
+| 18 | IN   | Indiana                               |
+| 19 | IA   | Iowa                                  |
+| 20 | KS   | Kansas                                |
+| 21 | KY   | Kentucky                              |
+| 22 | LA   | Louisiana                             |
+| 23 | ME   | Maine                                 |
+| 24 | MH   | Marshall Islands                      |
+| 25 | MD   | Maryland                              |
+| 26 | MA   | Massachusetts                         |
+| 27 | MI   | Michigan                              |
+| 28 | MN   | Minnesota                             |
+| 29 | MS   | Mississippi                           |
+| 30 | MO   | Missouri                              |
+| 31 | MT   | Montana                               |
+| 32 | NE   | Nebraska                              |
+| 33 | NV   | Nevada                                |
+| 34 | NH   | New Hampshire                         |
+| 35 | NJ   | New Jersey                            |
+| 36 | NM   | New Mexico                            |
+| 37 | NY   | New York                              |
+| 38 | NC   | North Carolina                        |
+| 39 | ND   | North Dakota                          |
+| 40 | MP   | Northern Mariana Islands              |
+| 41 | OH   | Ohio                                  |
+| 42 | OK   | Oklahoma                              |
+| 43 | OR   | Oregon                                |
+| 44 | PW   | Palau                                 |
+| 45 | PA   | Pennsylvania                          |
+| 46 | PR   | Puerto Rico                           |
+| 47 | RI   | Rhode Island                          |
+| 48 | SC   | South Carolina                        |
+| 49 | SD   | South Dakota                          |
+| 50 | TN   | Tennessee                             |
+| 51 | TX   | Texas                                 |
+| 52 | UT   | Utah                                  |
+| 53 | VT   | Vermont                               |
+| 54 | VI   | Virgin Islands                        |
+| 55 | VA   | Virginia                              |
+| 56 | WA   | Washington                            |
+| 57 | WV   | West Virginia                         |
+| 58 | WI   | Wisconsin                             |
++----+------+---------------------------------------+
+58 rows in set (0.00 sec)
+
+mysql> INSERT into Customers  (FirstName, MiddleName, LastName, StreetName, City, StateId, EmailAddress, Password) VALUES ('John', 'M', 'Scully', '1 Newark St', 'Hoboken', 35, NULL, NULL);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> INSERT into Customers  (FirstName, MiddleName, LastName, StreetName, City, StateId, EmailAddress, Password) VALUES ('Joshua', NULL, 'Kushner', '325 South End Ave', 'NewYork', 37, NULL, NULL);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> INSERT into Customers  (FirstName, MiddleName, LastName, StreetName, City, StateId, EmailAddress, Password) VALUES ('Reed', 'T', 'Hastings', '200 Vatrik St', 'San Francisco', 6, NULL, NULL);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into Customers  (FirstName, MiddleName, LastName, StreetName, City, StateId, EmailAddress, Password) values('Ellon', NULL, 'Musk', '1 Silicon Ave', 'SiliconValley', 6, NULL, NULL);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into Customers  (FirstName, MiddleName, LastName, StreetName, City, StateId, EmailAddress, Password) VALUES ('Jenny', 'L', 'Jackson', '11168 Antioch Rd', 'OverlandPark', 20, NULL, NULL);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> INSERT into Customers  (FirstName, MiddleName, LastName, StreetName, City, StateId, EmailAddress, Password) VALUES ('Jillian', NULL, 'Scully', '1918 Skibo Rd', 'Fayetteville', 38, NULL, NULL);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into Dealers(Name, StreetName, City, StateId) VALUES ('Brooklyn Tesla', '160 Van Brunt Street', 'Brroklyn', 37);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> INSERT into Dealers(Name, StreetName, City, StateId) VALUES('SanFrancisco Tesla', '1 Nicole Drive', 'SanFrancisco', 6);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> INSERT into Dealers(Name, StreetName, City, StateId) VALUES('Fayetteville Tesla', '255 Central Ave', 'Fayetteville', 38);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into Dealers(Name, StreetName, City, StateId) VALUES('OverlandPark Tesla', '11923 Sinatra Rd', 'OverlandPark', 20);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> INSERT into Dealers(Name, StreetName, City, StateId) VALUES ('Delaware Tesla', '12 Washington Dr', 'Dover', 9);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> INSERT into Dealers(Name, StreetName, City, StateId) VALUES('Whippany Tesla', '1255 Route 10', 'Whippany', 35);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> INSERT into Models(Name, Price, Description, ImagePath, Range1, Acceleration, TopSpeed, AllWheelDrive) 
+    -> 
+    -> VALUES ('Model S', 50000, 'Model S is designed from the ground up to be the safest, most exhilarating sedan on the road. With unparalleled performance delivered through Tesla’s unique, all-electric powertrain, Model S accelerates from 0 to 60 mph in as little as 2.8 seconds. Model S comes with Autopilot capabilities designed to make your highway driving not only safer, but stress free.', NULL, '270 miles (EPA)', '2.8 seconds 0-60 mph', 155, 1);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> INSERT into Models (Name, Price, Description, ImagePath, Range1, Acceleration, TopSpeed, AllWheelDrive) 
+    -> 
+    -> VALUES ('Model X', 70000, 'Model X is the safest, fastest and most capable sport utility vehicle in history. With all-wheel drive and a 90 kWh battery providing 257 miles of range, Model X has ample seating for seven adults and all of their gear. And it’s ludicrously fast, accelerating from zero to 60 miles per hour in as quick as 3.2 seconds. Model X is the SUV uncompromised.', NULL, '250 miles (EPA)', '3.8 seconds 0-60 mph', 150, 0);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> INSERT into Models (Name, Price, Description, ImagePath, Range1, Acceleration, TopSpeed, AllWheelDrive) 
+    -> 
+    -> VALUES ('Model 3', 35000, 'Model 3 combines real world range, performance, safety and spaciousness into a premium sedan that only Tesla can build. Our most affordable car yet, Model 3 achieves 215 miles of range per charge while starting at only $35,000 before incentives. Model 3 is designed to attain the highest safety ratings in every category. ', NULL, '230 miles (EPA)', '4.2 seconds 0-60 mph', 140, 0);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> INSERT into Orders(CustomerId, DealerId, ModelId, Quantity, Discount, TotalAmount, OrderDate) 
+    -> 
+    -> VALUES (1, 1, 1, 2, NULL, 100000, CAST('2016-06-01 00:00:00.000' AS DateTime));
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> INSERT into Orders(CustomerId, DealerId, ModelId, Quantity, Discount, TotalAmount, OrderDate) 
+    -> 
+    -> VALUES (1, 2, 2, 1, CAST(5.00 AS Decimal(12, 2)), 65000, CAST('2016-05-01 00:00:00.000' AS DateTime));
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> INSERT into Orders(CustomerId, DealerId, ModelId, Quantity, Discount, TotalAmount, OrderDate) 
+    -> 
+    -> VALUES (2, 3, 3, 1, NULL, 35000, CAST('2016-04-15 00:00:00.000' AS DateTime));
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> INSERT into Orders(CustomerId, DealerId, ModelId, Quantity, Discount, TotalAmount, OrderDate) 
+    -> 
+    -> VALUES (4, 6, 2, 10, CAST(10.00 AS Decimal(12, 2)), 630000, CAST('2015-04-28 00:00:00.000' AS DateTime));
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> INSERT into Orders(CustomerId, DealerId, ModelId, Quantity, Discount, TotalAmount, OrderDate) 
+    -> 
+    -> VALUES (3, 4, 3, 3, NULL, 105000, CAST('2016-01-15 00:00:00.000' AS DateTime));
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> INSERT into Orders(CustomerId, DealerId, ModelId, Quantity, Discount, TotalAmount, OrderDate) 
+    -> 
+    -> VALUES (6, 5, 1, 2, CAST(10.00 AS Decimal(12, 2)), 90000, CAST('2016-02-07 00:00:00.000' AS DateTime));
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> INSERT into Orders(CustomerId, DealerId, ModelId, Quantity, Discount, TotalAmount, OrderDate) 
+    -> 
+    -> VALUES (5, 1, 1, 1, NULL, 50000, CAST('2016-01-28 00:00:00.000' AS DateTime));
+Query OK, 1 row affected (0.00 sec)
+
+mysql> 
+mysql> 
+mysql> 
+mysql> INSERT into Orders(CustomerId, DealerId, ModelId, Quantity, Discount, TotalAmount, OrderDate) 
+    -> 
+    ->  VALUES (1, 2, 1, 1, NULL, 50000, CAST('2016-02-03 00:00:00.000' AS DateTime));
+Query OK, 1 row affected (0.01 sec)
+
+mysql> 
+mysql> INSERT into Orders(CustomerId, DealerId, ModelId, Quantity, Discount, TotalAmount, OrderDate) 
+    -> 
+    ->  VALUES (6, 3, 1, 2, NULL, 140000, CAST('2016-02-17 00:00:00.000' AS DateTime));
+Query OK, 1 row affected (0.00 sec)
+
+mysql> select * from Customers;
++----+-----------+------------+----------+-------------------+---------------+---------+--------------+----------+
+| Id | FirstName | MiddleName | LastName | StreetName        | City          | StateId | EmailAddress | Password |
++----+-----------+------------+----------+-------------------+---------------+---------+--------------+----------+
+|  1 | John      | M          | Scully   | 1 Newark St       | Hoboken       |      35 | NULL         | NULL     |
+|  2 | Joshua    | NULL       | Kushner  | 325 South End Ave | NewYork       |      37 | NULL         | NULL     |
+|  3 | Reed      | T          | Hastings | 200 Vatrik St     | San Francisco |       6 | NULL         | NULL     |
+|  4 | Ellon     | NULL       | Musk     | 1 Silicon Ave     | SiliconValley |       6 | NULL         | NULL     |
+|  5 | Jenny     | L          | Jackson  | 11168 Antioch Rd  | OverlandPark  |      20 | NULL         | NULL     |
+|  6 | Jillian   | NULL       | Scully   | 1918 Skibo Rd     | Fayetteville  |      38 | NULL         | NULL     |
++----+-----------+------------+----------+-------------------+---------------+---------+--------------+----------+
+6 rows in set (0.00 sec)
+
+mysql> SELECT * FROM Customers;
++----+-----------+------------+----------+-------------------+---------------+---------+--------------+----------+
+| Id | FirstName | MiddleName | LastName | StreetName        | City          | StateId | EmailAddress | Password |
++----+-----------+------------+----------+-------------------+---------------+---------+--------------+----------+
+|  1 | John      | M          | Scully   | 1 Newark St       | Hoboken       |      35 | NULL         | NULL     |
+|  2 | Joshua    | NULL       | Kushner  | 325 South End Ave | NewYork       |      37 | NULL         | NULL     |
+|  3 | Reed      | T          | Hastings | 200 Vatrik St     | San Francisco |       6 | NULL         | NULL     |
+|  4 | Ellon     | NULL       | Musk     | 1 Silicon Ave     | SiliconValley |       6 | NULL         | NULL     |
+|  5 | Jenny     | L          | Jackson  | 11168 Antioch Rd  | OverlandPark  |      20 | NULL         | NULL     |
+|  6 | Jillian   | NULL       | Scully   | 1918 Skibo Rd     | Fayetteville  |      38 | NULL         | NULL     |
++----+-----------+------------+----------+-------------------+---------------+---------+--------------+----------+
+6 rows in set (0.00 sec)
+
+mysql> SELECT * FROM Customers WHERE FirstName LIKE 'J%';
++----+-----------+------------+----------+-------------------+--------------+---------+--------------+----------+
+| Id | FirstName | MiddleName | LastName | StreetName        | City         | StateId | EmailAddress | Password |
++----+-----------+------------+----------+-------------------+--------------+---------+--------------+----------+
+|  1 | John      | M          | Scully   | 1 Newark St       | Hoboken      |      35 | NULL         | NULL     |
+|  2 | Joshua    | NULL       | Kushner  | 325 South End Ave | NewYork      |      37 | NULL         | NULL     |
+|  5 | Jenny     | L          | Jackson  | 11168 Antioch Rd  | OverlandPark |      20 | NULL         | NULL     |
+|  6 | Jillian   | NULL       | Scully   | 1918 Skibo Rd     | Fayetteville |      38 | NULL         | NULL     |
++----+-----------+------------+----------+-------------------+--------------+---------+--------------+----------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT * FROM Customers WHERE LastName LIKE '%ul%' AND MiddleName IS NULL;
++----+-----------+------------+----------+---------------+--------------+---------+--------------+----------+
+| Id | FirstName | MiddleName | LastName | StreetName    | City         | StateId | EmailAddress | Password |
++----+-----------+------------+----------+---------------+--------------+---------+--------------+----------+
+|  6 | Jillian   | NULL       | Scully   | 1918 Skibo Rd | Fayetteville |      38 | NULL         | NULL     |
++----+-----------+------------+----------+---------------+--------------+---------+--------------+----------+
+1 row in set (0.00 sec)
+
+mysql> SELECT C.FirstName, L.FullName 
+    -> 
+    ->     FROM
+    -> 
+    ->     Customers C
+    -> 
+    ->     LEFT JOIN
+    -> 
+    ->     LookupStates L ON C.StateId = L.Id;
++-----------+----------------+
+| FirstName | FullName       |
++-----------+----------------+
+| John      | New Jersey     |
+| Joshua    | New York       |
+| Reed      | California     |
+| Ellon     | California     |
+| Jenny     | Kansas         |
+| Jillian   | North Carolina |
++-----------+----------------+
+6 rows in set (0.00 sec)
+
+mysql>  SELECT c.FirstName, c.MiddleName, c.LastName, c.StreetName, c.City, c.EmailAddress, c.Password, l.FullName AS StateFullName
+    -> 
+    ->      FROM Customers c
+    -> 
+    ->      INNER JOIN
+    -> 
+    ->      LookupStates l 
+    -> 
+    ->      ON c.StateId = l.Id WHERE l.FullName = 'California';
++-----------+------------+----------+---------------+---------------+--------------+----------+---------------+
+| FirstName | MiddleName | LastName | StreetName    | City          | EmailAddress | Password | StateFullName |
++-----------+------------+----------+---------------+---------------+--------------+----------+---------------+
+| Reed      | T          | Hastings | 200 Vatrik St | San Francisco | NULL         | NULL     | California    |
+| Ellon     | NULL       | Musk     | 1 Silicon Ave | SiliconValley | NULL         | NULL     | California    |
++-----------+------------+----------+---------------+---------------+--------------+----------+---------------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT DISTINCT l.FullName AS StateName
+    -> 
+    ->        FROM Customers c
+    -> 
+    ->        INNER JOIN
+    -> 
+    ->        LookupStates l ON c.StateId = l.Id
+    -> 
+    ->        UNION
+    -> 
+    ->        SELECT DISTINCT l.FullName AS StateName
+    -> 
+    ->        FROM Dealers d
+    -> 
+    ->        INNER JOIN
+    -> 
+    ->        LookupStates l ON d.StateId = l.Id;
++----------------+
+| StateName      |
++----------------+
+| California     |
+| Kansas         |
+| New Jersey     |
+| New York       |
+| North Carolina |
+| Delaware       |
++----------------+
+6 rows in set (0.00 sec)
+
+mysql> SELECT *
+    -> 
+    ->     FROM Orders
+    -> 
+    ->     WHERE MONTH(OrderDate) = 2 AND YEAR(OrderDate) = 2016 AND Discount IS NOT NULL;
++----+------------+----------+---------+----------+----------+-------------+---------------------+
+| Id | CustomerId | DealerId | ModelId | Quantity | Discount | TotalAmount | OrderDate           |
++----+------------+----------+---------+----------+----------+-------------+---------------------+
+|  6 |          6 |        5 |       1 |        2 |    10.00 |       90000 | 2016-02-07 00:00:00 |
++----+------------+----------+---------+----------+----------+-------------+---------------------+
+1 row in set (0.00 sec)
+
+mysql> 
+mysql>     or
+    -> 
+    ->     (SELECT * FROM Orders WHERE OrderDate LIKE '%2016-02%' AND Discount IS NOT NULL;)
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'or
+
+    (SELECT * FROM Orders WHERE OrderDate LIKE '%2016-02%' AND Discount IS N' at line 1
+    -> ^C^C
+
+^C
+mysql> SELECT *
+    -> 
+    ->     FROM Orders
+    -> 
+    ->     WHERE MONTH(OrderDate) = 2 AND YEAR(OrderDate) = 2016 AND Discount IS NOT NULL;
++----+------------+----------+---------+----------+----------+-------------+---------------------+
+| Id | CustomerId | DealerId | ModelId | Quantity | Discount | TotalAmount | OrderDate           |
++----+------------+----------+---------+----------+----------+-------------+---------------------+
+|  6 |          6 |        5 |       1 |        2 |    10.00 |       90000 | 2016-02-07 00:00:00 |
++----+------------+----------+---------+----------+----------+-------------+---------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT * FROM Orders ORDER BY OrderDate;
++----+------------+----------+---------+----------+----------+-------------+---------------------+
+| Id | CustomerId | DealerId | ModelId | Quantity | Discount | TotalAmount | OrderDate           |
++----+------------+----------+---------+----------+----------+-------------+---------------------+
+|  4 |          4 |        6 |       2 |       10 |    10.00 |      630000 | 2015-04-28 00:00:00 |
+|  5 |          3 |        4 |       3 |        3 |     NULL |      105000 | 2016-01-15 00:00:00 |
+|  7 |          5 |        1 |       1 |        1 |     NULL |       50000 | 2016-01-28 00:00:00 |
+|  8 |          1 |        2 |       1 |        1 |     NULL |       50000 | 2016-02-03 00:00:00 |
+|  6 |          6 |        5 |       1 |        2 |    10.00 |       90000 | 2016-02-07 00:00:00 |
+|  9 |          6 |        3 |       1 |        2 |     NULL |      140000 | 2016-02-17 00:00:00 |
+|  3 |          2 |        3 |       3 |        1 |     NULL |       35000 | 2016-04-15 00:00:00 |
+|  2 |          1 |        2 |       2 |        1 |     5.00 |       65000 | 2016-05-01 00:00:00 |
+|  1 |          1 |        1 |       1 |        2 |     NULL |      100000 | 2016-06-01 00:00:00 |
++----+------------+----------+---------+----------+----------+-------------+---------------------+
+9 rows in set (0.00 sec)
+
+mysql> SELECT o.Id, o.CustomerId, o.DealerId, o.ModelId, o.Quantity, o.Discount, o.TotalAmount, o.OrderDate,
+    -> 
+    ->     CONCAT_WS(' ',FirstName,MiddleName,LastName) AS CustomerName,
+    -> 
+    ->     d.Name AS DealerName
+    -> 
+    ->     FROM Orders o
+    -> 
+    ->     INNER JOIN Customers c ON o.CustomerId = c.Id
+    -> 
+    ->     INNER JOIN Dealers d ON o.DealerId = d.Id
+    -> 
+    ->     ORDER BY o.TotalAmount, o.OrderDate, CustomerName, DealerName;
++----+------------+----------+---------+----------+----------+-------------+---------------------+-----------------+--------------------+
+| Id | CustomerId | DealerId | ModelId | Quantity | Discount | TotalAmount | OrderDate           | CustomerName    | DealerName         |
++----+------------+----------+---------+----------+----------+-------------+---------------------+-----------------+--------------------+
+|  3 |          2 |        3 |       3 |        1 |     NULL |       35000 | 2016-04-15 00:00:00 | Joshua Kushner  | Fayetteville Tesla |
+|  7 |          5 |        1 |       1 |        1 |     NULL |       50000 | 2016-01-28 00:00:00 | Jenny L Jackson | Brooklyn Tesla     |
+|  8 |          1 |        2 |       1 |        1 |     NULL |       50000 | 2016-02-03 00:00:00 | John M Scully   | SanFrancisco Tesla |
+|  2 |          1 |        2 |       2 |        1 |     5.00 |       65000 | 2016-05-01 00:00:00 | John M Scully   | SanFrancisco Tesla |
+|  6 |          6 |        5 |       1 |        2 |    10.00 |       90000 | 2016-02-07 00:00:00 | Jillian Scully  | Delaware Tesla     |
+|  1 |          1 |        1 |       1 |        2 |     NULL |      100000 | 2016-06-01 00:00:00 | John M Scully   | Brooklyn Tesla     |
+|  5 |          3 |        4 |       3 |        3 |     NULL |      105000 | 2016-01-15 00:00:00 | Reed T Hastings | OverlandPark Tesla |
+|  9 |          6 |        3 |       1 |        2 |     NULL |      140000 | 2016-02-17 00:00:00 | Jillian Scully  | Fayetteville Tesla |
+|  4 |          4 |        6 |       2 |       10 |    10.00 |      630000 | 2015-04-28 00:00:00 | Ellon Musk      | Whippany Tesla     |
++----+------------+----------+---------+----------+----------+-------------+---------------------+-----------------+--------------------+
+9 rows in set (0.00 sec)
+
+mysql> SELECT CONCAT_WS(' ',FirstName,MiddleName,LastName) AS CustomerName
+    -> 
+    ->     FROM Customers c
+    -> 
+    ->     INNER JOIN
+    -> 
+    ->     Orders o ON c.Id = o.CustomerId
+    -> 
+    ->     INNER JOIN
+    -> 
+    ->     Dealers d ON o.DealerId = d.Id
+    -> 
+    ->     WHERE
+    -> 
+    ->     d.Name = 'Brooklyn Tesla';
++-----------------+
+| CustomerName    |
++-----------------+
+| John M Scully   |
+| Jenny L Jackson |
++-----------------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT Id AS CustId, CONCAT_WS(' ',FirstName,MiddleName,LastName) AS FullName FROM Customers;
++--------+-----------------+
+| CustId | FullName        |
++--------+-----------------+
+|      1 | John M Scully   |
+|      2 | Joshua Kushner  |
+|      3 | Reed T Hastings |
+|      4 | Ellon Musk      |
+|      5 | Jenny L Jackson |
+|      6 | Jillian Scully  |
++--------+-----------------+
+6 rows in set (0.00 sec)
+
+mysql> SELECT
+    -> 
+    ->     o.Id AS OrderId,
+    -> 
+    ->     CONCAT_WS(' ',FirstName,MiddleName,LastName) AS CustomerFullName,
+    -> 
+    ->     m.Name AS ModelName,
+    -> 
+    ->     o.TotalAmount
+    -> 
+    ->     FROM Orders o
+    -> 
+    ->     INNER JOIN
+    -> 
+    ->     Customers c ON o.CustomerId = c.Id
+    -> 
+    ->     INNER JOIN
+    -> 
+    ->     Models m ON o.ModelId = m.Id;
++---------+------------------+-----------+-------------+
+| OrderId | CustomerFullName | ModelName | TotalAmount |
++---------+------------------+-----------+-------------+
+|       1 | John M Scully    | Model S   |      100000 |
+|       6 | Jillian Scully   | Model S   |       90000 |
+|       7 | Jenny L Jackson  | Model S   |       50000 |
+|       8 | John M Scully    | Model S   |       50000 |
+|       9 | Jillian Scully   | Model S   |      140000 |
+|       2 | John M Scully    | Model X   |       65000 |
+|       4 | Ellon Musk       | Model X   |      630000 |
+|       3 | Joshua Kushner   | Model 3   |       35000 |
+|       5 | Reed T Hastings  | Model 3   |      105000 |
++---------+------------------+-----------+-------------+
+9 rows in set (0.00 sec)
+
+mysql> SELECT c.FirstName, c.LastName, m.Name AS ModelName, o.TotalAmount
+    -> 
+    ->     FROM
+    -> 
+    ->     Customers c
+    -> 
+    ->     INNER JOIN
+    -> 
+    ->     Orders o ON c.Id = o.CustomerId
+    -> 
+    ->     INNER JOIN
+    -> 
+    ->     Models m ON o.ModelId = m.Id;
++-----------+----------+-----------+-------------+
+| FirstName | LastName | ModelName | TotalAmount |
++-----------+----------+-----------+-------------+
+| John      | Scully   | Model S   |      100000 |
+| Jillian   | Scully   | Model S   |       90000 |
+| Jenny     | Jackson  | Model S   |       50000 |
+| John      | Scully   | Model S   |       50000 |
+| Jillian   | Scully   | Model S   |      140000 |
+| John      | Scully   | Model X   |       65000 |
+| Ellon     | Musk     | Model X   |      630000 |
+| Joshua    | Kushner  | Model 3   |       35000 |
+| Reed      | Hastings | Model 3   |      105000 |
++-----------+----------+-----------+-------------+
+9 rows in set (0.00 sec)
+
+mysql> SELECT d.Id as DealerId, d.Name as DealerName, SUM(o.TotalAmount) as Total_Amount_of_Order_in_2016
+    -> 
+    ->      FROM Dealers d
+    -> 
+    ->      INNER JOIN Orders o ON d.Id=o.DealerId WHERE YEAR(o.OrderDate)=2016 
+    -> 
+    ->      GROUP BY
+    -> 
+    ->      D.Id, D.Name;
+ERROR 1054 (42S22): Unknown column 'D.Id' in 'group statement'
+mysql> SELECT d.Id as DealerId, d.Name as DealerName, SUM(o.TotalAmount) as Total_Amount_of_Order_in_2016       FROM Dealers d       INNER JOIN Orders o ON d.Id=o.DealerId WHERE YEAR(o.OrderDate)=2016        GROUP BY       d.Id, d.Name;
++----------+--------------------+-------------------------------+
+| DealerId | DealerName         | Total_Amount_of_Order_in_2016 |
++----------+--------------------+-------------------------------+
+|        1 | Brooklyn Tesla     |                        150000 |
+|        2 | SanFrancisco Tesla |                        115000 |
+|        3 | Fayetteville Tesla |                        175000 |
+|        4 | OverlandPark Tesla |                        105000 |
+|        5 | Delaware Tesla     |                         90000 |
++----------+--------------------+-------------------------------+
+5 rows in set (0.01 sec)
+
+mysql> SELECT
+    -> 
+    ->      d.Id AS DealerId,
+    -> 
+    ->      d.Name AS DealerName,
+    -> 
+    ->      SUM(o.TotalAmount) AS Total_Amount_of_Order_in_2016,
+    -> 
+    ->      SUM(o.TotalAmount) AS Final_Total_Amount
+    -> 
+    ->      FROM  Dealers d
+    -> 
+    ->      LEFT JOIN
+    -> 
+    ->      Orders o ON d.Id = o.DealerId
+    -> 
+    ->      WHERE YEAR(O.OrderDate) = 2016 OR O.OrderDate IS NULL
+    -> 
+    ->      GROUP BY
+    -> 
+    ->      d.Id, d.Name
+    -> 
+    ->      HAVING
+    -> 
+    ->      SUM(O.TotalAmount) > 100000;
+ERROR 1054 (42S22): Unknown column 'O.OrderDate' in 'where clause'
+mysql> SELECT       d.Id AS DealerId,       d.Name AS DealerName,       SUM(o.TotalAmount) AS Total_Amount_of_Order_in_2016,       SUM(o.TotalAmount) AS Final_Total_Amount       FROM  Dealers d       LEFT JOIN       Orders o ON d.Id = o.DealerId       WHERE YEAR(o.OrderDate) = 2016 OR o.OrderDate IS NULL       GROUP BY       d.Id, d.Name       HAVING       SUM(o.TotalAmount) > 100000;
++----------+--------------------+-------------------------------+--------------------+
+| DealerId | DealerName         | Total_Amount_of_Order_in_2016 | Final_Total_Amount |
++----------+--------------------+-------------------------------+--------------------+
+|        1 | Brooklyn Tesla     |                        150000 |             150000 |
+|        2 | SanFrancisco Tesla |                        115000 |             115000 |
+|        3 | Fayetteville Tesla |                        175000 |             175000 |
+|        4 | OverlandPark Tesla |                        105000 |             105000 |
++----------+--------------------+-------------------------------+--------------------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT
+    -> 
+    ->     SUM(TotalAmount) AS TotalAmountIn2016
+    -> 
+    ->     FROM Orders
+    -> 
+    ->     WHERE YEAR(OrderDate) = 2016;
++-------------------+
+| TotalAmountIn2016 |
++-------------------+
+|            635000 |
++-------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT
+    -> 
+    ->     c.Id AS CustomerId,
+    -> 
+    ->     CONCAT_WS(' ',FirstName,MiddleName,LastName) AS CustomerFullName,
+    -> 
+    ->     COUNT(o.Id) AS NumberOfOrders
+    -> 
+    ->     FROM
+    -> 
+    ->     Customers c
+    -> 
+    ->     JOIN
+    -> 
+    ->     Orders o ON c.Id = o.CustomerId
+    -> 
+    ->     GROUP BY
+    -> 
+    ->     c.Id, c.FirstName, c.MiddleName, c.LastName
+    -> 
+    ->     HAVING
+    -> 
+    ->     COUNT(o.Id) > 2;
++------------+------------------+----------------+
+| CustomerId | CustomerFullName | NumberOfOrders |
++------------+------------------+----------------+
+|          1 | John M Scully    |              3 |
++------------+------------------+----------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT
+    -> 
+    ->     d.Id AS DealerId,
+    -> 
+    ->     d.Name AS DealerName
+    -> 
+    ->     FROM
+    -> 
+    ->     Dealers d
+    -> 
+    ->     LEFT JOIN
+    -> 
+    ->     Orders o ON d.Id = o.DealerId
+    -> 
+    ->     WHERE
+    -> 
+    ->     o.DealerId IS NULL;
+Empty set (0.00 sec)
+
+mysql> SELECT
+    -> 
+    ->     c.Id AS CustomerId,
+    -> 
+    ->     CONCAT_WS(' ',FirstName,MiddleName,LastName) AS CustomerFullName,
+    -> 
+    ->     SUM(o.TotalAmount) AS TotalAmount
+    -> 
+    ->     FROM
+    -> 
+    ->     Customers c
+    -> 
+    ->     LEFT JOIN
+    -> 
+    ->     Orders o ON c.Id = o.CustomerId
+    -> 
+    ->     GROUP BY
+    -> 
+    ->     c.Id, c.FirstName, c.MiddleName, c.LastName
+    -> 
+    ->     ORDER BY
+    -> 
+    ->     TotalAmount DESC
+    -> 
+    ->     LIMIT 2;
++------------+------------------+-------------+
+| CustomerId | CustomerFullName | TotalAmount |
++------------+------------------+-------------+
+|          4 | Ellon Musk       |      630000 |
+|          6 | Jillian Scully   |      230000 |
++------------+------------------+-------------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT
+    -> 
+    ->     o.Id AS OrderId,
+    -> 
+    ->     d.Id AS DealerId,
+    -> 
+    ->     d.Name AS DealerName,
+    -> 
+    ->     c.Id AS CustomerId,
+    -> 
+    ->     CONCAT_WS(' ',FirstName,MiddleName,LastName) AS CustomerFullName,
+    -> 
+    ->     o.TotalAmount
+    -> 
+    ->     FROM
+    -> 
+    ->     Orders o
+    -> 
+    ->     JOIN
+    -> 
+    ->     Dealers d ON o.DealerId = d.Id
+    -> 
+    ->     JOIN
+    -> 
+    ->     Customers c ON o.CustomerId = c.Id
+    -> 
+    ->     WHERE
+    -> 
+    ->     o.Id = (
+    -> 
+    ->         SELECT o2.Id
+    -> 
+    ->         FROM Orders o2
+    -> 
+    ->         WHERE o2.DealerId = d.Id
+    -> 
+    ->         ORDER BY o2.TotalAmount DESC
+    -> 
+    ->         LIMIT 1
+    -> 
+    ->     );
++---------+----------+--------------------+------------+------------------+-------------+
+| OrderId | DealerId | DealerName         | CustomerId | CustomerFullName | TotalAmount |
++---------+----------+--------------------+------------+------------------+-------------+
+|       1 |        1 | Brooklyn Tesla     |          1 | John M Scully    |      100000 |
+|       2 |        2 | SanFrancisco Tesla |          1 | John M Scully    |       65000 |
+|       9 |        3 | Fayetteville Tesla |          6 | Jillian Scully   |      140000 |
+|       5 |        4 | OverlandPark Tesla |          3 | Reed T Hastings  |      105000 |
+|       6 |        5 | Delaware Tesla     |          6 | Jillian Scully   |       90000 |
+|       4 |        6 | Whippany Tesla     |          4 | Ellon Musk       |      630000 |
++---------+----------+--------------------+------------+------------------+-------------+
+6 rows in set (0.00 sec)
+
+mysql> SELECT
+    -> 
+    ->     d.Id AS DealerId,
+    -> 
+    ->     d.Name AS DealerName
+    -> 
+    ->     FROM
+    -> 
+    ->     Dealers d
+    -> 
+    ->     LEFT JOIN
+    -> 
+    ->     Orders o ON d.Id = o.DealerId
+    -> 
+    ->     WHERE
+    -> 
+    ->     o.DealerId IS NULL;
+Empty set (0.00 sec)
+
+mysql> INSERT INTO Customers (Id, FirstName, MiddleName, LastName, StreetName, City, StateId)
+    -> 
+    ->     VALUES (150, 'Cathi', NULL, 'Triana', '200 East Monroe St', 'Harrisburg', 
+    -> 
+    ->     (SELECT Id FROM LookupStates WHERE FullName = 'Pennsylvania'));
+Query OK, 1 row affected (0.00 sec)
+
+mysql> UPDATE Customers
+    -> 
+    ->     SET
+    -> 
+    ->     StreetName = '2579 Wabash Ave',
+    -> 
+    ->     City = 'Springfield',
+    -> 
+    ->     StateId = (SELECT Id FROM LookupStates WHERE FullName = 'Illinois')
+    -> 
+    ->     WHERE
+    -> 
+    ->     Id = 5;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> INSERT INTO Orders (CustomerId, DealerId,ModelId, Quantity, Discount, TotalAmount, OrderDate)
+    -> 
+    ->     VALUES (
+    -> 
+    ->     (SELECT Id FROM Customers WHERE FirstName = 'Reed' AND LastName = 'Hastings'),
+    -> 
+    ->     (SELECT d.Id FROM Dealers d
+    -> 
+    ->     JOIN Customers c on c.StateId=d.StateId AND c.FirstName='Reed'),
+    -> 
+    ->     (SELECT Id FROM Models WHERE Name = 'Model 3'),
+    -> 
+    ->     2,
+    -> 
+    ->     NULL,
+    -> 
+    ->     70000,
+    -> 
+    ->     '2016-05-12'
+    -> 
+    -> );
+Query OK, 1 row affected (0.00 sec)
+
+mysql> select * from Customers;
++-----+-----------+------------+----------+--------------------+---------------+---------+--------------+----------+
+| Id  | FirstName | MiddleName | LastName | StreetName         | City          | StateId | EmailAddress | Password |
++-----+-----------+------------+----------+--------------------+---------------+---------+--------------+----------+
+|   1 | John      | M          | Scully   | 1 Newark St        | Hoboken       |      35 | NULL         | NULL     |
+|   2 | Joshua    | NULL       | Kushner  | 325 South End Ave  | NewYork       |      37 | NULL         | NULL     |
+|   3 | Reed      | T          | Hastings | 200 Vatrik St      | San Francisco |       6 | NULL         | NULL     |
+|   4 | Ellon     | NULL       | Musk     | 1 Silicon Ave      | SiliconValley |       6 | NULL         | NULL     |
+|   5 | Jenny     | L          | Jackson  | 2579 Wabash Ave    | Springfield   |      17 | NULL         | NULL     |
+|   6 | Jillian   | NULL       | Scully   | 1918 Skibo Rd      | Fayetteville  |      38 | NULL         | NULL     |
+| 150 | Cathi     | NULL       | Triana   | 200 East Monroe St | Harrisburg    |      45 | NULL         | NULL     |
++-----+-----------+------------+----------+--------------------+---------------+---------+--------------+----------+
+7 rows in set (0.00 sec)
+
+mysql> select * from Dealers;
++----+--------------------+----------------------+--------------+---------+
+| Id | Name               | StreetName           | City         | StateId |
++----+--------------------+----------------------+--------------+---------+
+|  1 | Brooklyn Tesla     | 160 Van Brunt Street | Brroklyn     |      37 |
+|  2 | SanFrancisco Tesla | 1 Nicole Drive       | SanFrancisco |       6 |
+|  3 | Fayetteville Tesla | 255 Central Ave      | Fayetteville |      38 |
+|  4 | OverlandPark Tesla | 11923 Sinatra Rd     | OverlandPark |      20 |
+|  5 | Delaware Tesla     | 12 Washington Dr     | Dover        |       9 |
+|  6 | Whippany Tesla     | 1255 Route 10        | Whippany     |      35 |
++----+--------------------+----------------------+--------------+---------+
+6 rows in set (0.00 sec)
+
+mysql> select * from LookupStates;
++----+------+---------------------------------------+
+| Id | Code | FullName                              |
++----+------+---------------------------------------+
+|  1 | AL   | Alabama                               |
+|  2 | AK   | Alaska                                |
+|  3 | AS   | American Samoa                        |
+|  4 | AZ   | Arizona                               |
+|  5 | AR   | Arkansas                              |
+|  6 | CA   | California                            |
+|  7 | CO   | Colorado                              |
+|  8 | CT   | Connecticut                           |
+|  9 | DE   | Delaware                              |
+| 10 | DC   | District of Columbia                  |
+| 11 | FM   | Federated LookupStatess of Micronesia |
+| 12 | FL   | Florida                               |
+| 13 | GA   | Georgia                               |
+| 14 | GU   | Guam                                  |
+| 15 | HI   | Hawaii                                |
+| 16 | ID   | Idaho                                 |
+| 17 | IL   | Illinois                              |
+| 18 | IN   | Indiana                               |
+| 19 | IA   | Iowa                                  |
+| 20 | KS   | Kansas                                |
+| 21 | KY   | Kentucky                              |
+| 22 | LA   | Louisiana                             |
+| 23 | ME   | Maine                                 |
+| 24 | MH   | Marshall Islands                      |
+| 25 | MD   | Maryland                              |
+| 26 | MA   | Massachusetts                         |
+| 27 | MI   | Michigan                              |
+| 28 | MN   | Minnesota                             |
+| 29 | MS   | Mississippi                           |
+| 30 | MO   | Missouri                              |
+| 31 | MT   | Montana                               |
+| 32 | NE   | Nebraska                              |
+| 33 | NV   | Nevada                                |
+| 34 | NH   | New Hampshire                         |
+| 35 | NJ   | New Jersey                            |
+| 36 | NM   | New Mexico                            |
+| 37 | NY   | New York                              |
+| 38 | NC   | North Carolina                        |
+| 39 | ND   | North Dakota                          |
+| 40 | MP   | Northern Mariana Islands              |
+| 41 | OH   | Ohio                                  |
+| 42 | OK   | Oklahoma                              |
+| 43 | OR   | Oregon                                |
+| 44 | PW   | Palau                                 |
+| 45 | PA   | Pennsylvania                          |
+| 46 | PR   | Puerto Rico                           |
+| 47 | RI   | Rhode Island                          |
+| 48 | SC   | South Carolina                        |
+| 49 | SD   | South Dakota                          |
+| 50 | TN   | Tennessee                             |
+| 51 | TX   | Texas                                 |
+| 52 | UT   | Utah                                  |
+| 53 | VT   | Vermont                               |
+| 54 | VI   | Virgin Islands                        |
+| 55 | VA   | Virginia                              |
+| 56 | WA   | Washington                            |
+| 57 | WV   | West Virginia                         |
+| 58 | WI   | Wisconsin                             |
++----+------+---------------------------------------+
+58 rows in set (0.00 sec)
+
+mysql> select * from Models;
++----+---------+-------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------+-----------------+----------------------+----------+------------------------------+
+| Id | Name    | Price | Description                                                                                                                                                                                                                                                                                                                                                                 | ImagePath | Range1          | Acceleration         | TopSpeed | AllWheelDrive                |
++----+---------+-------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------+-----------------+----------------------+----------+------------------------------+
+|  1 | Model S | 50000 | Model S is designed from the ground up to be the safest, most exhilarating sedan on the road. With unparalleled performance delivered through Tesla’s unique, all-electric powertrain, Model S accelerates from 0 to 60 mph in as little as 2.8 seconds. Model S comes with Autopilot capabilities designed to make your highway driving not only safer, but stress free.   | NULL      | 270 miles (EPA) | 2.8 seconds 0-60 mph |      155 | 0x01                         |
+|  2 | Model X | 70000 | Model X is the safest, fastest and most capable sport utility vehicle in history. With all-wheel drive and a 90 kWh battery providing 257 miles of range, Model X has ample seating for seven adults and all of their gear. And it’s ludicrously fast, accelerating from zero to 60 miles per hour in as quick as 3.2 seconds. Model X is the SUV uncompromised.            | NULL      | 250 miles (EPA) | 3.8 seconds 0-60 mph |      150 | 0x00                         |
+|  3 | Model 3 | 35000 | Model 3 combines real world range, performance, safety and spaciousness into a premium sedan that only Tesla can build. Our most affordable car yet, Model 3 achieves 215 miles of range per charge while starting at only $35,000 before incentives. Model 3 is designed to attain the highest safety ratings in every category.                                           | NULL      | 230 miles (EPA) | 4.2 seconds 0-60 mph |      140 | 0x00                         |
++----+---------+-------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------+-----------------+----------------------+----------+------------------------------+
+3 rows in set (0.00 sec)
+
+mysql> select * from Orders;
++----+------------+----------+---------+----------+----------+-------------+---------------------+
+| Id | CustomerId | DealerId | ModelId | Quantity | Discount | TotalAmount | OrderDate           |
++----+------------+----------+---------+----------+----------+-------------+---------------------+
+|  1 |          1 |        1 |       1 |        2 |     NULL |      100000 | 2016-06-01 00:00:00 |
+|  2 |          1 |        2 |       2 |        1 |     5.00 |       65000 | 2016-05-01 00:00:00 |
+|  3 |          2 |        3 |       3 |        1 |     NULL |       35000 | 2016-04-15 00:00:00 |
+|  4 |          4 |        6 |       2 |       10 |    10.00 |      630000 | 2015-04-28 00:00:00 |
+|  5 |          3 |        4 |       3 |        3 |     NULL |      105000 | 2016-01-15 00:00:00 |
+|  6 |          6 |        5 |       1 |        2 |    10.00 |       90000 | 2016-02-07 00:00:00 |
+|  7 |          5 |        1 |       1 |        1 |     NULL |       50000 | 2016-01-28 00:00:00 |
+|  8 |          1 |        2 |       1 |        1 |     NULL |       50000 | 2016-02-03 00:00:00 |
+|  9 |          6 |        3 |       1 |        2 |     NULL |      140000 | 2016-02-17 00:00:00 |
+| 10 |          3 |        2 |       3 |        2 |     NULL |       70000 | 2016-05-12 00:00:00 |
++----+------------+----------+---------+----------+----------+-------------+---------------------+
+10 rows in set (0.01 sec)
+
+mysql> exit
+Bye
+srivathsaachary@ip-172-31-24-65:~$ cd Demo_Git
+bash: cd: Demo_Git: No such file or directory
+srivathsaachary@ip-172-31-24-65:~$ cd desktop
+bash: cd: desktop: No such file or directory
+srivathsaachary@ip-172-31-24-65:~$ cd Desktop
+srivathsaachary@ip-172-31-24-65:~/Desktop$ cd Demo_Git
+srivathsaachary@ip-172-31-24-65:~/Desktop/Demo_Git$ ls -ls-> output.txt
+ls: invalid option -- '-'
+Try 'ls --help' for more information.
+srivathsaachary@ip-172-31-24-65:~/Desktop/Demo_Git$ ls > ls_output.txt
+srivathsaachary@ip-172-31-24-65:~/Desktop/Demo_Git$ 
